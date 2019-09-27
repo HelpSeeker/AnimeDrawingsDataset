@@ -4,6 +4,7 @@ require 'rake'
 require 'mechanize'
 require 'nokogiri'
 require 'fileutils'
+require 'json'
 require File.dirname(__FILE__) + "/rake/lib.rb"
 
 class DownloadDataTasks < FileProcessingTasks
@@ -54,11 +55,11 @@ class DownloadDataTasks < FileProcessingTasks
 		agent = Mechanize.new
 		url = "http://danbooru.donmai.us/posts/#{id}"
 		page = agent.get(url)
-		text = page.body
+        text = page.body
 		doc = Nokogiri::HTML(text)
 		doc.xpath("//meta").each do |meta|
-			if !meta.key?("property") then next end
-			if meta["property"] == "og:image"
+			if !meta.key?("name") then next end
+			if meta["name"] == "og:image"
 				image_url = meta["content"]
 				ext = File.extname(image_url)
 				save_image(agent, image_url, "#{dir_name}/images_raw/#{id}#{ext}", target_file)
